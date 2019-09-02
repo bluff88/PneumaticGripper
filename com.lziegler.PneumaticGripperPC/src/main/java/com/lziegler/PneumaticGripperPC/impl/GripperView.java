@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
@@ -13,6 +15,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -53,6 +56,7 @@ public class GripperView implements SwingProgramNodeView<GripperContribution>{
 	private ActionListener nodeFunctionActionListener;
 	private JRadioButton gripRadioButton = new JRadioButton("Grip");
 	private JRadioButton releaseRadioButton = new JRadioButton("Release");
+	private JComboBox<Integer> ioComboBox = new JComboBox<Integer>();
 	
 	private GripperLiveControl liveControl;
 	
@@ -75,6 +79,8 @@ public class GripperView implements SwingProgramNodeView<GripperContribution>{
 		panel.add(createRadioButton("Grip", gripRadioButton, nodeFunctionActionListener));
 		panel.add(createHorizontalSpacer(5));
 		panel.add(createRadioButton("Release", releaseRadioButton, nodeFunctionActionListener));
+		panel.add(createHorizontalSpacer(15));
+		panel.add(createIOComboBox(ioComboBox));
 		
 		if(showGripperLiveControl) {
 			liveControl = new GripperLiveControl(provider);
@@ -185,9 +191,40 @@ public class GripperView implements SwingProgramNodeView<GripperContribution>{
 			e.printStackTrace();
 		}
 		return imageLabel;
+			
+	}
+	
+	private Box createIOComboBox(final JComboBox<Integer> combo) {
+		Box box = Box.createHorizontalBox();
+		box.setAlignmentX(Component.LEFT_ALIGNMENT);
 		
+		JLabel label = new JLabel("Digital output: ");
+		
+		combo.setPreferredSize(new Dimension (105,30));
+		combo.setMaximumSize(combo.getPreferredSize());
+		combo.addItemListener(new ItemListener()
+				{
+
+					@Override
+					public void itemStateChanged(ItemEvent e) {
+						// TODO Auto-generated method stub
+						if(e.getStateChange() == ItemEvent.SELECTED) {
+							
+						}
+					}
+			
+				});
+				
+		box.add(label);
+		box.add(combo);
+		
+		
+		return box;
 		
 	}
+	
+	
+	
 	
 	//BufferedImage myPicture = ImageIO.read(this.getClass().getResource("logoprocobot.png"));
 	//JLabel 

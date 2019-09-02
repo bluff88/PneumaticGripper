@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -71,16 +72,21 @@ public class GripperView implements SwingProgramNodeView<GripperContribution>{
 		panel.add(setLogo());
 		panel.add(createHorizontalSpacer(5));
 		panel.add(createDescriptionLabel("ProCobot gripper software that is allowing user to control a pneumatic gripper "));
-		panel.add(createDescriptionLabel("through a digital output. You can test it by clicking GRIP/RELEASE.  "));
+		panel.add(createDescriptionLabel("through a digital output. You can test it by clicking GRIP/RELEASE"));
+		panel.add(createDescriptionLabel("in the toolbar in UR+ tab."));
 		panel.add(createHorizontalSpacer(5));
 		panel.add(createHorizontalSpacer(15));
-		
+		panel.add(createDescriptionLabel("Choose output from to combo box that matches hardware configuration "));
+		panel.add(createDescriptionLabel("of your pneumatic gripper."));
+		panel.add(createHorizontalSpacer(15));
+		panel.add(createIOComboBox(ioComboBox, provider));
+		panel.add(createHorizontalSpacer(15));
 		configureNodeFunctionRadioButtons(provider);
 		panel.add(createRadioButton("Grip", gripRadioButton, nodeFunctionActionListener));
 		panel.add(createHorizontalSpacer(5));
 		panel.add(createRadioButton("Release", releaseRadioButton, nodeFunctionActionListener));
 		panel.add(createHorizontalSpacer(15));
-		panel.add(createIOComboBox(ioComboBox));
+		
 		
 		if(showGripperLiveControl) {
 			liveControl = new GripperLiveControl(provider);
@@ -101,6 +107,14 @@ public class GripperView implements SwingProgramNodeView<GripperContribution>{
 		}
 	}
 
+	public void setIOComboBoxItems(Integer[] items) {
+		ioComboBox.removeAllItems();
+		ioComboBox.setModel(new DefaultComboBoxModel<Integer>(items));
+	}
+	
+	public void setIOComboBoxSelection(Integer item) {
+		ioComboBox.setSelectedItem(item);
+	}
 	
 	public void setRadioButtons(boolean gripActive) {
 		gripRadioButton.setSelected(gripActive);
@@ -194,11 +208,11 @@ public class GripperView implements SwingProgramNodeView<GripperContribution>{
 			
 	}
 	
-	private Box createIOComboBox(final JComboBox<Integer> combo) {
+	private Box createIOComboBox(final JComboBox<Integer> combo, final ContributionProvider<GripperContribution> provider) {
 		Box box = Box.createHorizontalBox();
 		box.setAlignmentX(Component.LEFT_ALIGNMENT);
 		
-		JLabel label = new JLabel("Digital output: ");
+		JLabel label = new JLabel("Output's No.: ");
 		
 		combo.setPreferredSize(new Dimension (105,30));
 		combo.setMaximumSize(combo.getPreferredSize());
@@ -209,8 +223,11 @@ public class GripperView implements SwingProgramNodeView<GripperContribution>{
 					public void itemStateChanged(ItemEvent e) {
 						// TODO Auto-generated method stub
 						if(e.getStateChange() == ItemEvent.SELECTED) {
-							
+							provider.get().onOutputSelection((Integer) e.getItem());
 						}
+//						else if(e.getStateChange() == ItemEvent.DESELECTED) {
+//							
+//						}
 					}
 			
 				});

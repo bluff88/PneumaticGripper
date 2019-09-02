@@ -15,6 +15,7 @@ public class GripperContribution implements ProgramNodeContribution {
 	private final DataModel model;
 	private final GripperView view;
 	private final UndoRedoManager undoRedoManager;
+	
 
 	public GripperContribution(ProgramAPIProvider apiProvider, GripperView view, DataModel model, com.ur.urcap.api.contribution.program.CreationContext context) {
 		// TODO Auto-generated constructor stub
@@ -27,6 +28,8 @@ public class GripperContribution implements ProgramNodeContribution {
 	
 	
 	private static final String KEY_NODEFUNCTION = "gripperNodeFunction";
+	private static final String KEY_OUTPUT = "Output";
+	private static final Integer DEFAULT_OUTPUT = 0;
 	
 	private boolean isGripNode() {
 		return model.get(KEY_NODEFUNCTION, true);
@@ -44,6 +47,29 @@ public class GripperContribution implements ProgramNodeContribution {
 		});
 	}
 	
+	public void onOutputSelection(final Integer output) {
+		undoRedoManager.recordChanges(new UndoableChanges() {
+
+			@Override
+			public void executeChanges() {
+				model.set(KEY_OUTPUT, output);
+			}
+					
+		});
+		
+	}
+	private Integer getOutput() {
+		return model.get(KEY_OUTPUT, DEFAULT_OUTPUT );
+	}
+	
+	private Integer[] getOutputItems() {
+		Integer[] items = new Integer[8];
+		for(int i = 0; i<8; i++) {
+			items[i] = i;
+		}
+		return items;
+	}
+	
 	
 	@Override
 	public void openView() {
@@ -51,6 +77,9 @@ public class GripperContribution implements ProgramNodeContribution {
 		System.out.println("openView of ManipulateIO program node");
 		view.setRadioButtons(isGripNode());
 		view.updateLiveControl();
+		view.setIOComboBoxItems(getOutputItems());
+		view.setIOComboBoxSelection(getOutput());
+
 		
 	}
 
@@ -63,10 +92,10 @@ public class GripperContribution implements ProgramNodeContribution {
 	@Override
 	public String getTitle() {
 		if(isGripNode()){
-			return "Grip it!";
+			return "Grip it! DO"+getOutput();
 		}
 		else{
-			return "Release it!";
+			return "Release it! DO"+getOutput();
 		}
 		
 	}
@@ -81,11 +110,11 @@ public class GripperContribution implements ProgramNodeContribution {
 	public void generateScript(ScriptWriter writer) {
 		// TODO Auto-generated method stub
 		if(isGripNode()){
-			writer.appendLine("set_digital_out(0, True)");
+			writer.appendLine("set_digital_out("+getOutput()+",True)");
 			writer.sleep(0.2);
 		}
 		else{
-			writer.appendLine("set_digital_out(0, False)");
+			writer.appendLine("set_digital_out("+getOutput()+", False)");
 			writer.sleep(0.2);
 		}
 		
